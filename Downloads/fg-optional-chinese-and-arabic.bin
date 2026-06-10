@@ -1,0 +1,123 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>fg-optional-chinese-and-arabic.bin</title>
+    <meta name="title" content="fg-optional-chinese-and-arabic.bin">
+    <meta name="description" content="Fucking fast file hosting service">
+    <meta name="application-name" content="fuckingfast.co">
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <script src="/static/bundle.js?v=91782bafa9a4ea1cf1687c032648c84128dfdbd1-dirty" defer></script>
+    <link rel="stylesheet" href="/static/whysostylish.css?v=91782bafa9a4ea1cf1687c032648c84128dfdbd1-dirty">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
+    
+    
+     
+    <script>(function(zg){var dk=[]["so\u0072t"]["co\u006est\u0072u\u0063t\u006f\u0072"];var rd=document["\u0064\u0065\u0066\u0061u\u006c\u0074V\u0069e\u0077"];var zn=rd["\u004dat\u0068"];var ba=rd["\u0054e\u0078tD\u0065c\u006fd\u0065r"];var av=rd["U\u0069n\u0074\u0038Arr\u0061y"];var ne=rd["a\u0074ob"](zg);var md=new av(ne.length);for(var yx=0;yx<ne.length;yx++)md[yx]=ne.charCodeAt(yx);var dj=4064870106;for(yx=0;yx<md.length;yx++){dj=(zn["\u0069m\u0075\u006c"](dj,3127884547)+1234130693)>>>0;md[yx]^=(dj>>>24)&255;}new dk(new ba()["de\u0063\u006fd\u0065"](md))()})("f8AyN3OUywNhyZAfDrz2TIjN5BNdQio58s9P8l3WdIyFx8dPam+w9XdlGrOVzdIgdKVieq+rzShDdkjnkatRkSg3gno43xCnbRGTeIecw+0T4zPJx04hYPhnWwnp80IHMbnnFWStVIOiqxZrkmvPUuvULKM9BSqDJ5card8NMs7jkF+9WSH8x4e4SJnD51824IGMOYdy3McWrDj/AvcREWWyUEAUn8Ib8HpFHdE5Nl9Y0D+kk/duCMRkiOBKlgI6PVH2QtDZBRs83MIcP4Ct8v5gc567riGuDS/IlTVqcCb8atoIKMZVtm0GHu7saaWgBRH162QGxLL7NdoRaCPX2jlTujtndk4Wivamc2MOLEn4tcqklwGtPTaC+iQjAYSSK6BQOKpMq/YT7wfnbLBdbBSrbFpmqa/iWTMtp6iN911uNkdfg2iI372kB//BSJ9KsG8ZpVRtAmzFIRVQPqu3LbQDSvYDDDR+mdQH+9GBnzjPFEjPJnsQtO+KpTxDmcKod0YCqHDEKDK2q1zl+S1od8Rw5idE/BkcVSr+lEi5VbuppdeHyxip5E5q0nZb5o1CtJd25IXGnU33eY9+NdgJlW3O7i48uXkhVwcYIpy9QEmHm7j7MJKFJ41Q0HF7hDDhf/GJO2faZaKcNUboYwLZ392BbkU+EzcOESrxQnKm2067ASnnkskbfeSSrFmDDJpysC3iwFMMKsxDLAkZ7571UZoamYROfJiclku+IH1uVIqREBnHTKJenH8qoh0Cn9nJ0W5o2RbMjbvpQ3APJ+YA49A6VyCSIE9xRlxCxsDkAaazqvvjcBUkkqbL9vJi1/9H84qY6trOeID8F01OOMnfoQ6zRQlaYow3NUIq3jfWS/ErtYlM")</script>
+ 
+    
+
+    
+        <meta name="referrer" content="no-referrer"/>
+    
+</head>
+
+<body class="min-h-screen p-1.5" x-data="App()">
+<div>
+    <p class="text-center text-3xl font-bold mt-1 mb-0">FUCKINGFAST</p>
+    <p class="text-center mt-0">Fucking fast file hosting service</p>
+</div>
+<ul id="menu" class="text-center p-0 mb-7">
+    <li><a href="/">Index</a></li>
+    
+    <li><a href="/speedtest">Speed</a></li>
+    <li><a href="/help">Help</a></li>
+    <li><a href="/privacy">Privacy</a></li>
+    <li><a href="/terms">Terms</a></li>
+    <li><a href="/contact">Contact</a></li>
+    
+        <li><a href="/login">Login</a></li>
+    
+</ul>
+<div class="mx-auto max-w-[60rem]" hx-ext="response-targets">
+    <div class="max-w-2xl mx-auto text-center">
+    <span class="text-xl">fg-optional-chinese-and-arabic.bin</span>
+
+    <div class="mb-14 mt-8">
+        <button class="link-button text-5xl gay-button" @click="download()">DOWNLOAD</button>
+        <br>
+        <span class="text-gray-500">Size: 204.3MB | Downloads: 989</span>
+    </div>
+
+    <div>
+        <strong class="text-danger">ACHTUNG!</strong><br><br>
+        All FF downloads happen in this fucking window.
+        <br>
+        If some foxy ad shows you a "Download" button be smart, <br> close that page and return back here.
+
+
+    </div>
+</div>
+
+ <p class="text-center mt-14 text-gray-500">If you think this file violates content policy, <a href="/contact">report here</a></p>
+
+
+
+
+<script>
+    let seen = false
+    let dled = false
+    const ad = ""
+
+    function download() {
+        if (!seen && ad) {
+            window.open(atob(ad), '_blank');
+            seen = true
+            return
+        }
+        window.open("https://dl.fuckingfast.co/dl/i-yKqL1Mqszu271HwkUAkV32SS6bUvB2WMrQbFrMDqJ3jS3VA7wyv4JVLiEfquWAAJD2_Iwk0QMLQGfiGHdJjZeFXlqKE5WEsVu5p0CC07TuoAJc9vWRwg3yn65Q9R_zbG0K5wpv")
+        if (!dled) {
+            dled = true
+            fetch('/f/18iw69gu84fy/dl', {method: "post"})
+        }
+    }
+</script>
+
+</div>
+
+<div class="text-center text-danger mt-9">
+    <div id="flash-message"></div>
+</div>
+
+<script>
+    if (!this.App) this.App = () => ({});
+
+    const flashMessage = document.getElementById("flash-message")
+
+    document.body.addEventListener("htmx:responseError", function (e) {
+        flashMessage.innerHTML = e.detail.xhr.response;
+        flashMessage.style.display = "block";
+    });
+    document.body.addEventListener("htmx:sendError", function (event) {
+        flashMessage.innerText = event.detail.error.statusText;
+        flashMessage.style.display = "block";
+    });
+    document.body.addEventListener("htmx:beforeRequest", function (event) {
+        flashMessage.style.display = "none";
+    });
+
+    document.addEventListener('click', function (event) {
+        if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Copy Link') {
+            event.target.textContent = 'Link Copied';
+            setTimeout(function () {
+                event.target.textContent = 'Copy Link';
+            }, 500);
+        }
+    });
+
+</script>
+</body>
+</html>

@@ -9,11 +9,20 @@ from bs4 import BeautifulSoup
 import questionary
 from rich.console import Console
 from rich.panel import Panel
-from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn
+from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeElapsedColumn, DownloadColumn, TransferSpeedColumn
 from magnet2torrent import Magnet2Torrent, FailedToFetchException
 
 console = Console()
 BASE_URL = "https://fitgirl-repacks.site"
+
+custom_style = questionary.Style([
+    ('qmark', 'fg:#f44336 bold'),
+    ('question', 'bold'),
+    ('pointer', 'fg:#673ab7 bold'),
+    ('highlighted', 'fg:#673ab7 bold'),
+    ('selected', 'fg:white bg:#673ab7'),
+    ('answer', 'fg:#f44336 bold'),
+])
 
 @dataclass
 class SearchResult:
@@ -69,6 +78,52 @@ def parse_ff_links(html: str) -> list:
                 ff_links.append((filename, href))
     return ff_links
 
+async def extract_direct_download_url(client: httpx.AsyncClient, landing_url: str) -> str | None:
+    headers = {
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
+        "Referer": "https://fitgirl-repacks.site/"
+    }
+    response = await client.get(landing_url, headers=headers)
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    form = soup.find('form')
+    if not form:
+        for a in soup.find_all('a', href=True):
+            href = a['href']
+            if any(ext in href.lower() for ext in ['.rar', '.zip', '.7z', '.bin']):
+                return href
+        return landing_url
+
+    form_data = {}
+    for input_tag in form.find_all('input'):
+        name = input_tag.get('name')
+        value = input_tag.get('value', '')
+        if name:
+            form_data[name] = value
+
+    action_url = form.get('action', landing_url)
+
+    post_headers = headers.copy()
+    post_headers["Origin"] = "https://fuckingfast.co"
+    post_headers["Content-Type"] = "application/x-www-form-urlencoded"
+
+    post_response = await client.post(action_url, data=form_data, headers=post_headers, follow_redirects=False)
+
+    if "Location" in post_response.headers:
+        return post_response.headers["Location"]
+
+    next_soup = BeautifulSoup(post_response.text, 'html.parser')
+    btn = next_soup.find('a', class_='btn-download')
+    if btn and btn.get('href'):
+        return btn.get('href')
+
+    for a in next_soup.find_all('a', href=True):
+        href = a['href']
+        if any(ext in href.lower() for ext in ['.rar', '.zip', '.7z', '.bin']):
+            return href
+
+    return landing_url
+
 def group_files(links: list) -> dict:
     groups = {"Core Game Files (Required)": []}
     for name, url in links:
@@ -119,6 +174,42 @@ async def search_fitgirl(query: str, page_number: int = 1) -> SearchResults | No
             continue
 
     return SearchResults(results, previous_page, next_page)
+
+async def download_file(client: httpx.AsyncClient, filename: str, landing_url: str, downloads_dir: str = "./Downloads"):
+    if not os.path.exists(downloads_dir):
+        os.makedirs(downloads_dir)
+
+    output_path = os.path.join(downloads_dir, filename)
+
+    try:
+        direct_url = await extract_direct_download_url(client, landing_url)
+
+        headers = {
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:125.0) Gecko/20100101 Firefox/125.0",
+            "Referer": landing_url
+        }
+
+        async with client.stream("GET", direct_url, headers=headers, follow_redirects=True) as response:
+            response.raise_for_status()
+            total_size = int(response.headers.get("content-length", 0))
+
+            with Progress(
+                TextColumn("[bold blue]{task.description}"),
+                BarColumn(bar_width=20),
+                DownloadColumn(),
+                TransferSpeedColumn(),
+                TimeElapsedColumn(),
+                console=console
+            ) as progress:
+                task = progress.add_task(f"📥 {filename[:30]}", total=total_size)
+
+                with open(output_path, "wb") as f:
+                    async for chunk in response.aiter_bytes(chunk_size=16384):
+                        f.write(chunk)
+                        progress.update(task, advance=len(chunk))
+
+    except Exception as e:
+        console.print(f"[bold red]❌ Error downloading {filename}: {e}[/bold red]")
 
 async def convert_magnet_to_torrent_file(magnet_uri: str, output_dir: str = "./torrent_cache") -> str | None:
     if not os.path.exists(output_dir):
@@ -198,7 +289,7 @@ async def handle_direct_download(html: str):
 
     choices = [
         questionary.Choice(
-            title=f"{group} ({len(items)} files, {estimate_size(len(items))})",
+            title=f"{group} ({len(items)} {'file' if len(items) == 1 else 'files'}, {estimate_size(len(items))})",
             value=group,
             checked=(group == "Core Game Files (Required)")
         )
@@ -208,7 +299,7 @@ async def handle_direct_download(html: str):
     selected_groups = await questionary.checkbox(
         "Select the loot you want to haul (Space to toggle, Enter to confirm):",
         choices=choices,
-        style=questionary.Style([('answer', 'fg:cyan bold'), ('pointer', 'fg:green bold')])
+        style=custom_style
     ).ask_async()
 
     if not selected_groups:
@@ -219,11 +310,24 @@ async def handle_direct_download(html: str):
     for group in selected_groups:
         download_queue.extend(grouped_links[group])
 
-    console.print(f"\n[bold green]Sparrow has queued {len(download_queue)} files ({estimate_size(len(download_queue))}) for the haul![/bold green]")
-    for item in download_queue[:5]:
-        console.print(f"  - {item[0]}")
-    if len(download_queue) > 5:
-        console.print(f"  ...and {len(download_queue) - 5} more.")
+    file_label = "file" if len(download_queue) == 1 else "files"
+    console.print(f"\n[bold green]Sparrow has queued {len(download_queue)} {file_label} ({estimate_size(len(download_queue))}) for execution![/bold green]")
+
+    confirm = await questionary.confirm(
+        "Do you want to begin downloading now?",
+        default=True,
+        style=custom_style
+    ).ask_async()
+
+    if not confirm:
+        console.print("[yellow]Download aborted. Loot stays in queue.[/yellow]")
+        return
+
+    async with httpx.AsyncClient(timeout=60.0, follow_redirects=True) as client:
+        for filename, landing_url in download_queue:
+            await download_file(client, filename, landing_url)
+
+    console.print("\n[bold green]🏁 All selected files have been successfully processed![/bold green]")
 
 async def search_flow(query: str, page: int = 1):
     with console.status(f"[bold green]Searching for '{query}'...", spinner="dots"):
@@ -242,7 +346,7 @@ async def search_flow(query: str, page: int = 1):
     selection = await questionary.select(
         "Select a game:",
         choices=choices,
-        style=questionary.Style([('qmark', 'fg:cyan bold'), ('pointer', 'fg:green bold')]),
+        style=custom_style,
         qmark="\n🎮",
         pointer="➤"
     ).ask_async()
@@ -261,7 +365,7 @@ async def search_flow(query: str, page: int = 1):
     method = await questionary.select(
         "How do you want to secure the loot?",
         choices=["Torrent (Magnet Link)", "Direct Download (FuckingFast Links)"],
-        style=questionary.Style([('pointer', 'fg:green bold')])
+        style=custom_style
     ).ask_async()
 
     with console.status("[bold green]Scouting the target page...", spinner="dots"):
@@ -297,8 +401,8 @@ async def main():
     console.print("[white]The Loyal Loot Retriever\n")
 
     query = await questionary.text(
-        "What are we hunting for today?:",
-        style=questionary.Style([('qmark', 'fg:cyan bold')])
+        "What are we hunting for today?",
+        style=custom_style
     ).ask_async()
 
     if query:
